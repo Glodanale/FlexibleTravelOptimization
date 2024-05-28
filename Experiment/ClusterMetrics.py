@@ -4,7 +4,6 @@ import mysql.connector
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
-from sklearn.metrics import mutual_info_score, adjusted_rand_score
 
 def buildDataFrame(table):
     connection = mysql.connector.connect(
@@ -156,9 +155,6 @@ def relationMetrics(table):
     real = df["real_ei_encoded"]
     allocation = df["allocation_ei_encoded"]
     
-    ari = adjusted_rand_score(real, allocation)
-    mi = mutual_info_score(real, allocation)
-    
     confusion_matrix = pd.crosstab(real, allocation, rownames=["Real"], colnames=["Allocated"])
     correct_predictions = confusion_matrix.values.diagonal().sum()
     total_predictions = confusion_matrix.values.sum()
@@ -168,7 +164,7 @@ def relationMetrics(table):
     cursor.close()
     connection.close()
     
-    return ari, mi, accuracy
+    return accuracy
 
 def calculate_wcss_euclidean(X_scaled, Y):
     wcss = 0
@@ -197,7 +193,7 @@ def calculate_wcss_manhattan(X_scaled, Y):
 def runClusterMetrics(table):
     data = buildDataFrame(table)
     X, Y = processData(data)
-    ari, mi, accuracy = relationMetrics(table)
+    accuracy = relationMetrics(table)
     
     silhouetteE = silhouette_score(X, Y)
     silhouetteM = silhouette_score(X, Y, metric="manhattan")
@@ -212,8 +208,6 @@ def runClusterMetrics(table):
     print(f"Calinski-Harabasz Index: {ch_index}")
     print(f"Within-Cluster Sum of Squares Euclidean: {wcssE}")
     print(f"Within-Cluster Sum of Squares Manhattan: {wcssM}")
-    print(f"Adjusted Rand Index: {ari}")
-    print(f"Mutual Information (MI): {mi}")
     print(f"Accuracy: {accuracy}")
     
-    return silhouetteE, silhouetteM, db_index, ch_index, wcssE, wcssM, ari, mi, accuracy
+    return silhouetteE, silhouetteM, db_index, ch_index, wcssE, wcssM, accuracy
