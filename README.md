@@ -1,6 +1,7 @@
 # Flexible Travel Optimization
 
 Note: This project is still in progress
+
 Seli-supervised clustering system for determining the best allocation strategy for a traveling visitation system.  This system is based on the k-means clustering system with conditions for the constraints of this problem detailed below:
 
 ### Fixed Dynamics
